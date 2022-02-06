@@ -1,15 +1,15 @@
 import { AnimatePresence, motion, useViewportScroll } from "framer-motion";
 import { useState } from "react";
 import { useQuery } from "react-query";
-import { useMatch, useNavigate } from "react-router-dom";
+import { useLocation, useMatch, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import {
   getNowMovies,
   getPopularMovies,
   getTopRateMovies,
   getUpcomingMovies,
-  IGetMoviesResult,
-  IMovie,
+  IGetVideoResult,
+  IVideo,
 } from "../api";
 import SliderCon from "../components/SliderCon";
 import { makeImagePath } from "../utils";
@@ -280,27 +280,27 @@ const Overview = styled.p`
 // const offset = 6;
 
 function Home() {
-  const nowPlayingMovieData: IMovie[] = [];
-  const topRatedMovieData: IMovie[] = [];
-  const upcommingMovieData: IMovie[] = [];
-  const PopularMovieData: IMovie[] = [];
+  const nowPlayingMovieData: IVideo[] = [];
+  const topRatedMovieData: IVideo[] = [];
+  const upcommingMovieData: IVideo[] = [];
+  const PopularMovieData: IVideo[] = [];
   // const navigate = useNavigate();
   // const bigMovieMatch = useMatch("/movies/:movieId");
   // const { scrollY } = useViewportScroll();
   // useQuery의 배열 첫번째는 카테고리, 두번째는 고유 키. 두번째 항목은 사용할 fetcher
-  const nowPlayingMovies = useQuery<IGetMoviesResult>(
+  const nowPlayingMovies = useQuery<IGetVideoResult>(
     ["movies", "nowPlaying"],
     getNowMovies
   );
-  const topRatedMovies = useQuery<IGetMoviesResult>(
+  const topRatedMovies = useQuery<IGetVideoResult>(
     ["movies", "topRated"],
     getTopRateMovies
   );
-  const upcomingMovies = useQuery<IGetMoviesResult>(
+  const upcomingMovies = useQuery<IGetVideoResult>(
     ["movies", "upcoming"],
     getUpcomingMovies
   );
-  const popularMovies = useQuery<IGetMoviesResult>(
+  const popularMovies = useQuery<IGetVideoResult>(
     ["movies", "popular"],
     getPopularMovies
   );
@@ -308,6 +308,8 @@ function Home() {
   topRatedMovies?.data?.results.map((item) => topRatedMovieData.push(item));
   upcomingMovies?.data?.results.map((item) => upcommingMovieData.push(item));
   popularMovies?.data?.results.map((item) => PopularMovieData.push(item));
+
+  const location = useLocation();
   // const [index, setIndex] = useState(0);
   // const [leaving, setLeaving] = useState(false);
   // const [back, setBack] = useState(false);
@@ -376,6 +378,7 @@ function Home() {
               whatType="movie"
               videoData={nowPlayingMovieData}
               sliderTitle={"Now Playing"}
+              search={location.search ? location.search : ""}
             />
           )}
           {upcommingMovieData && (
@@ -383,7 +386,8 @@ function Home() {
               sliderKey="m2"
               whatType="movie"
               videoData={upcommingMovieData}
-              sliderTitle={"Upcoming"}
+              sliderTitle={"Upcoming Movies"}
+              search={location.search ? location.search : ""}
             />
           )}
 
@@ -392,7 +396,8 @@ function Home() {
               sliderKey="m3"
               whatType="movie"
               videoData={PopularMovieData}
-              sliderTitle={"Popular"}
+              sliderTitle={"Popular Movies"}
+              search={location.search ? location.search : ""}
             />
           )}
 
@@ -401,7 +406,8 @@ function Home() {
               sliderKey="m4"
               whatType="movie"
               videoData={topRatedMovieData}
-              sliderTitle={"Top Rated"}
+              sliderTitle={"Top Rated Movies"}
+              search={location.search ? location.search : ""}
             />
           )}
 

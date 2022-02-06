@@ -1,15 +1,17 @@
 import { motion, AnimatePresence, useViewportScroll } from "framer-motion";
 import { useState } from "react";
 import { useQuery } from "react-query";
-import { useMatch, useNavigate } from "react-router-dom";
+import { useLocation, useMatch, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { getNowMovies, IGetMoviesResult, IMovie } from "../api";
+import { getNowMovies, IGetVideoResult, IVideo } from "../api";
 import { makeImagePath } from "../utils";
+import DetailModal from "./DetailModal";
 
 const Slider = styled.div`
   position: relative;
   top: -180px;
   margin-bottom: 70px;
+  height: 250px;
 `;
 
 const ListTitle = styled.div`
@@ -21,14 +23,13 @@ const ListTitle = styled.div`
 
 const ArrowBtn = styled(motion.div)`
   color: white;
-  z-index: 1;
+  z-index: 10;
   width: 65px;
   height: 185px;
   display: flex;
   justify-content: center;
   align-items: center;
   position: absolute;
-  bottom: -210px;
   i {
     position: relative;
     text-align: center;
@@ -232,16 +233,37 @@ const offset = 6;
 
 interface ISliderConProps {
   sliderTitle: string;
-  videoData: IMovie[];
+  videoData: IVideo[];
   whatType: string;
   sliderKey: string;
+  search: string;
 }
 
-function SliderCon({ sliderKey, sliderTitle, whatType, videoData }: ISliderConProps) {
+function SliderCon({
+  sliderKey,
+  sliderTitle,
+  whatType,
+  videoData,
+  search,
+}: ISliderConProps) {
   const navigate = useNavigate();
-  const bigMovieMatch = useMatch("/movies/:movieId");
+  const location = useLocation();
+  // const bigMovieMatch = useMatch("/movies/:movieId");
+  const bigMovieMatch = useMatch(!search ? `/movies/:movieId` : "undefined");
+  console.log(bigMovieMatch);
+  const locationMovie = {
+    params: {
+      movieId: new URLSearchParams(location.search).get("movies"),
+    },
+  };
+  const locationTv = {
+    params: {
+      tvId: new URLSearchParams(location.search).get("tv"),
+    },
+  };
+
   const { scrollY } = useViewportScroll();
-  // const { data, isLoading } = useQuery<IGetMoviesResult>(
+  // const { data, isLoading } = useQuery<IGetVideoResult>(
   //   ["movies", "newPlaying"],
   //   getNowMovies
   // );
@@ -274,8 +296,21 @@ function SliderCon({ sliderKey, sliderTitle, whatType, videoData }: ISliderConPr
     }
   };
   const toggleLeaving = () => setLeaving((prev) => !prev);
-  const onBoxClicked = (movieId: number) => {
-    navigate(`/movies/${movieId}`);
+  let keyword = new URLSearchParams(location.search).get("keyword");
+  const onBoxClicked = (id: number) => {
+    if (!search) {
+      if (whatType === "movie") {
+        navigate(`/movies/${id}`);
+      } else if (whatType === "tv") {
+        navigate(`/tv/${id}`);
+      }
+    } else if (search) {
+      if (whatType === "movie") {
+        navigate(`/search?keyword=${keyword}&movies=${id}`);
+      } else if (whatType === "tv") {
+        navigate(`/search?keyword=${keyword}&tv=${id}`);
+      }
+    }
   };
   const onOverlayClick = () => {
     navigate("/");
@@ -299,8 +334,8 @@ function SliderCon({ sliderKey, sliderTitle, whatType, videoData }: ISliderConPr
           onExitComplete={toggleLeaving}
           custom={back}
         >
-          <ListTitle>{sliderTitle}</ListTitle>
-          <ArrowBtn onClick={decreaseIndex}>
+          <ListTitle key={sliderTitle + sliderKey}>{sliderTitle}</ListTitle>
+          <ArrowBtn key="leftBtn" onClick={decreaseIndex}>
             <motion.i key="leftI" className="fas fa-chevron-left"></motion.i>
           </ArrowBtn>
           <Row
@@ -319,8 +354,8 @@ function SliderCon({ sliderKey, sliderTitle, whatType, videoData }: ISliderConPr
               .slice(offset * index, offset * index + offset)
               .map((movie) => (
                 <Box
-                  layoutId={movie.id + ""}
-                  key={movie.id}
+                  key={movie.id + sliderKey}
+                  layoutId={movie.id + sliderKey}
                   variants={boxVariants}
                   initial="normal"
                   whileHover="hover"
@@ -329,35 +364,47 @@ function SliderCon({ sliderKey, sliderTitle, whatType, videoData }: ISliderConPr
                   bgPhoto={
                     movie.backdrop_path
                       ? makeImagePath(movie.backdrop_path, "w500")
+                      : makeImagePath(movie.poster_path, "w500")
+                      ? makeImagePath(movie.poster_path, "w500")
                       : NEXFLIX_LOGO_URL
                   }
                 >
-                  <Info variants={infoVariants}>
-                    <h4>{movie.title}</h4>
+                  <Info key="boxInfo" variants={infoVariants}>
+                    <h4>{movie.title || movie.name}</h4>
                   </Info>
                 </Box>
               ))}
           </Row>
-          <ArrowBtn onClick={increaseIndex}>
+          <ArrowBtn key="rightBtn" onClick={increaseIndex}>
             <motion.i key="rightI" className="fas fa-chevron-right"></motion.i>
           </ArrowBtn>
         </AnimatePresence>
       </Slider>
+
+      {/* <DetailModal
+        key={"qwer"}
+        search={search}
+        videoData={videoData}
+        bigMovieMatch={bigMovieMatch ? bigMovieMatch : locationMovie}
+      /> */}
       <AnimatePresence>
         {bigMovieMatch ? (
           <>
             <Overlay
+              key="overlay"
               onClick={onOverlayClick}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
             />
             <BigMovie
-              layoutId={bigMovieMatch.params.movieId}
+              key="bigMovie"
+              layoutId={bigMovieMatch.params.movieId + sliderKey}
               style={{ top: scrollY.get() + 100 }}
             >
               {clickedMovie && (
                 <>
                   <BigCover
+                    key="bigCover"
                     style={{
                       backgroundImage: `linear-gradient(to top, black, transparent), url(${makeImagePath(
                         clickedMovie.backdrop_path,
@@ -365,26 +412,26 @@ function SliderCon({ sliderKey, sliderTitle, whatType, videoData }: ISliderConPr
                       )})`,
                     }}
                   >
-                    <BigTitle>{clickedMovie.title}</BigTitle>
-                    <UserBox>
-                      <Playbox>
-                        <i className="fas fa-play"></i>
-                        <a
-                          href={`https://www.youtube.com/results?search_query=${clickedMovie.title}`}
-                          target="_blank"
-                        >
+                    <BigTitle key="bigTitle">{clickedMovie.title}</BigTitle>
+                    <UserBox key="userBox">
+                      <a
+                        href={`https://www.youtube.com/results?search_query=${clickedMovie.title}`}
+                        target="_blank"
+                      >
+                        <Playbox key="playBox">
+                          <i className="fas fa-play"></i>
                           <span> Play</span>
-                        </a>
-                      </Playbox>
-                      <IconBox>
+                        </Playbox>
+                      </a>
+                      <IconBox key="iconBox1">
                         <i className="far fa-thumbs-up"></i>
                       </IconBox>
-                      <IconBox>
+                      <IconBox key="iconBox2">
                         <i className="fas fa-plus"></i>
                       </IconBox>
                     </UserBox>
                   </BigCover>
-                  <BigOverview>
+                  <BigOverview key="bigOverview">
                     {clickedMovie.overview}
                     <br />
                     <h1>Release Date</h1>

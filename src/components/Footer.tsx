@@ -1,10 +1,9 @@
 import styled from "styled-components";
 
-const Container = styled.div`
+const Container = styled.footer`
   background-color: #8080801c;
   height: 150px;
   width: 100%;
-  margin-top: 80px;
   display: flex;
   align-items: center;
   justify-content: center;
