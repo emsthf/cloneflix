@@ -1,10 +1,10 @@
 {
   "files": {
-    "main.js": "/cloneflix/static/js/main.c98793fe.js",
+    "main.js": "/cloneflix/static/js/main.edd2b578.js",
     "index.html": "/cloneflix/index.html",
-    "main.c98793fe.js.map": "/cloneflix/static/js/main.c98793fe.js.map"
+    "main.edd2b578.js.map": "/cloneflix/static/js/main.edd2b578.js.map"
   },
   "entrypoints": [
-    "static/js/main.c98793fe.js"
+    "static/js/main.edd2b578.js"
   ]
 }
