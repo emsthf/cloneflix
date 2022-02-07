@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { Helmet } from "react-helmet";
 import { useQuery } from "react-query";
 import { useLocation } from "react-router-dom";
 import styled from "styled-components";
@@ -7,6 +8,9 @@ import SliderCon from "../components/SliderCon";
 
 const Wrapper = styled.div`
   padding-top: 400px;
+  height: auto;
+  min-height: 100%;
+  padding-bottom: 150px;
 `;
 
 const Loader = styled.div`
@@ -24,8 +28,8 @@ function Search() {
   // URLSearchParams는 자바스크립트 기본 기능으로, 파싱하기 쉽게 =단위로 value를 분리해 준다
   const keyword = new URLSearchParams(location.search).get("keyword");
   useEffect(() => {}, [location]);
-  console.log("keyword : ", keyword);
-  console.log("location : ", location);
+  // console.log("keyword : ", keyword);
+  // console.log("location : ", location);
 
   const word =
     keyword
@@ -47,6 +51,9 @@ function Search() {
   return (
     <>
       <Wrapper>
+        <Helmet>
+          <title>Solfilx | Search - {keyword}</title>
+        </Helmet>
         {!searchTvData.data?.results[0] && !searchMovieData.data?.results[0] ? (
           <Loader>Couldn't find anything... 😱</Loader>
         ) : (
@@ -58,7 +65,7 @@ function Search() {
                 whatType="tv"
                 search={location.search ? location.search : ""}
                 videoData={searchTvData.data?.results}
-                sliderTitle={`TV Show Searcing : ${keyword}`}
+                sliderTitle={`Search TV Shows by "${keyword}"`}
               />
             )}
             {searchMovieData.data?.results[0] && (
@@ -68,7 +75,7 @@ function Search() {
                 search={location.search ? location.search : ""}
                 videoData={searchMovieData.data?.results}
                 whatType="movie"
-                sliderTitle={`Movie Searching : ${keyword}`}
+                sliderTitle={`Search Movies by "${keyword}"`}
               />
             )}
           </>

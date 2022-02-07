@@ -112,7 +112,7 @@ interface IForm {
 function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
   // useMatch는 react router의 기능으로, 해당 router 안에 있는지 알려준다
-  const homeMatch = useMatch("/");
+  const homeMatch = useMatch("/movies");
   const tvMatch = useMatch("/tv");
   const inputAnumation = useAnimation();
   const navAnimation = useAnimation();
@@ -154,7 +154,7 @@ function Header() {
   return (
     <Nav variants={navVariants} initial="top" animate={navAnimation}>
       <Col>
-        <Link to="/">
+        <Link to="/movies">
           <Logo
             variants={logoVariants}
             animate="normal"
@@ -172,7 +172,7 @@ function Header() {
         </Link>
         <Items>
           <Item>
-            <Link to="/">Movies {homeMatch && <Circle layoutId="circle" />}</Link>
+            <Link to="/movies">Movies {homeMatch && <Circle layoutId="circle" />}</Link>
           </Item>
           <Item>
             <Link to="/tv">Tv Shows {tvMatch && <Circle layoutId="circle" />}</Link>
@@ -188,6 +188,7 @@ function Header() {
             fill="currentColor"
             viewBox="0 0 20 20"
             xmlns="http://www.w3.org/2000/svg"
+            style={{ cursor: "pointer" }}
           >
             <path
               fillRule="evenodd"
