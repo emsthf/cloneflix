@@ -135,9 +135,10 @@ function Header() {
     setSearchOpen((prev) => !prev);
   };
   const navigate = useNavigate();
-  const { register, handleSubmit } = useForm<IForm>();
+  const { register, handleSubmit, setValue } = useForm<IForm>();
   const onValid = (data: IForm) => {
     navigate(`/search?keyword=${data.keyword}`);
+    setValue("keyword", "");
   };
 
   useEffect(() => {

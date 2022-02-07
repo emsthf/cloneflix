@@ -7,12 +7,12 @@ import Tv from "./routes/Tv";
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={process.env.PUBLIC_URL}>
       <Header />
       <Routes>
-        <Route path={`${process.env.PUBLIC_URL}/*`} element={<Home />} />
-        <Route path="/tv" element={<Tv />} />
+        <Route path="/tv*" element={<Tv />} />
         <Route path="/search" element={<Search />} />
+        <Route path="/*" element={<Home />} />
       </Routes>
       <Footer />
     </BrowserRouter>

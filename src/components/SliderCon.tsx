@@ -64,8 +64,10 @@ const Box = styled(motion.div)<{ bgPhoto: string }>`
   background-position: center center;
   height: 200px;
   font-size: 66px;
+  overflow: hidden;
   cursor: pointer;
   &:first-child {
+    // origin으로 센터와 왼쪽은 고정하겠다는 뜻 = 오른쪽으로만 움직임
     transform-origin: center left;
   }
   &:last-child {
@@ -75,7 +77,13 @@ const Box = styled(motion.div)<{ bgPhoto: string }>`
 
 const Info = styled(motion.div)`
   padding: 10px;
-  background-color: ${(props) => props.theme.black.lighter};
+  /* background-color: ${(props) => props.theme.black.lighter}; */
+  background: linear-gradient(
+    to top,
+    ${(props) => props.theme.black.lighter},
+    70%,
+    transparent
+  );
   opacity: 0;
   position: absolute;
   width: 100%;
